@@ -22,17 +22,13 @@
 		'<div class="oneline">' +
 		'    <input id="shareWith-{{cid}}" class="shareWithField" type="text" placeholder="{{sharePlaceholder}}" />' +
 		'    <span class="shareWithLoading icon-loading-small hidden"></span>'+
-		'{{{shareInfo}}}' +
+		'    <span class="shareWithConfirm icon icon-confirm"></span>' +
 		'</div>' +
 		'{{/if}}' +
 		'<div class="shareeListView subView"></div>' +
 		'<div class="linkShareView subView"></div>' +
 		'<div class="expirationView subView"></div>' +
 		'<div class="loading hidden" style="height: 50px"></div>';
-
-	var TEMPLATE_SHARE_INFO =
-		'<span class="icon icon-info shareWithRemoteInfo hasTooltip" ' +
-		'title="{{tooltip}}"></span>';
 
 	/**
 	 * @class OCA.Share.ShareDialogView
@@ -142,7 +138,7 @@
 			var $shareWithField = $('.shareWithField'),
 				view = this,
 				$loading = this.$el.find('.shareWithLoading'),
-				$shareInfo = this.$el.find('.shareWithRemoteInfo');
+				$confirm = this.$el.find('.shareWithConfirm');
 
 			var count = oc_config['sharing.minSearchStringLength'];
 			if (search.term.trim().length < count) {
@@ -167,7 +163,7 @@
 
 			$loading.removeClass('hidden');
 			$loading.addClass('inlineblock');
-			$shareInfo.addClass('hidden');
+			$confirm.addClass('hidden');
 
 			$shareWithField.removeClass('error')
 				.tooltip('hide');
@@ -184,7 +180,7 @@
 				function (result) {
 					$loading.addClass('hidden');
 					$loading.removeClass('inlineblock');
-					$shareInfo.removeClass('hidden');
+					$confirm.removeClass('hidden');
 					if (result.ocs.meta.statuscode === 100) {
 						var users   = result.ocs.data.exact.users.concat(result.ocs.data.users);
 						var groups  = result.ocs.data.exact.groups.concat(result.ocs.data.groups);
@@ -322,7 +318,7 @@
 			).fail(function() {
 				$loading.addClass('hidden');
 				$loading.removeClass('inlineblock');
-				$shareInfo.removeClass('hidden');
+				$confirm.removeClass('hidden');
 				OC.Notification.show(t('core', 'An error occurred. Please try again'));
 				window.setTimeout(OC.Notification.hide, 5000);
 			});
@@ -374,15 +370,15 @@
 			var $loading = this.$el.find('.shareWithLoading');
 			$loading.removeClass('hidden')
 				.addClass('inlineblock');
-			var $shareInfo = this.$el.find('.shareWithRemoteInfo');
-			$shareInfo.addClass('hidden');
+			var $confirm = this.$el.find('.shareWithConfirm');
+			$confirm.addClass('hidden');
 
 			var actionSuccess = function() {
 				$(e.target).val('')
 					.attr('disabled', false);
 				$loading.addClass('hidden')
 					.removeClass('inlineblock');
-				$shareInfo.removeClass('hidden');
+				$confirm.removeClass('hidden');
 			};
 
 			var actionError = function(obj, msg) {
@@ -391,7 +387,7 @@
 					.autocomplete('search', $(e.target).val());
 				$loading.addClass('hidden')
 					.removeClass('inlineblock');
-				$shareInfo.removeClass('hidden');
+				$confirm.removeClass('hidden');
 			};
 
 			if (s.item.resendMailNotification !== undefined) {
@@ -444,7 +440,6 @@
 				cid: this.cid,
 				shareLabel: t('core', 'Share'),
 				sharePlaceholder: this._renderSharePlaceholderPart(),
-				shareInfo: this._renderShareInfoPart(),
 				isSharingAllowed: this.model.sharePermissionPossible()
 			}));
 
@@ -489,27 +484,6 @@
 			this.linkShareView.showLink = this._showLink;
 		},
 
-		_renderShareInfoPart: function() {
-			var shareInfo = '';
-			var infoTemplate = this._getShareInfoTemplate();
-
-			if(this.configModel.get('isMailShareAllowed') && this.configModel.get('isRemoteShareAllowed')) {
-				shareInfo = infoTemplate({
-					tooltip: t('core', 'Share with other people by entering a user or group, a federated cloud ID or an email address.')
-				});
-			} else if(this.configModel.get('isRemoteShareAllowed')) {
-				shareInfo = infoTemplate({
-					tooltip: t('core', 'Share with other people by entering a user or group or a federated cloud ID.')
-				});
-			} else if(this.configModel.get('isMailShareAllowed')) {
-				shareInfo = infoTemplate({
-					tooltip: t('core', 'Share with other people by entering a user or group or an email address.')
-				});
-			}
-
-			return shareInfo;
-		},
-
 		_renderSharePlaceholderPart: function () {
 			var allowRemoteSharing = this.configModel.get('isRemoteShareAllowed');
 			var allowMailSharing = this.configModel.get('isMailShareAllowed');
@@ -541,15 +515,6 @@
 			return this._templates[key];
 		},
 
-		/**
-		 * returns the info template for remote sharing
-		 *
-		 * @returns {Function}
-		 * @private
-		 */
-		_getShareInfoTemplate: function() {
-			return this._getTemplate('shareInfo', TEMPLATE_SHARE_INFO);
-		}
 	});
 
 	OC.Share.ShareDialogView = ShareDialogView;
