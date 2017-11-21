@@ -138,7 +138,6 @@
 
 		/* trigger search after the field was re-selected */
 		onShareWithFieldFocus: function() {
-			this.$el.find('.shareWithField').autocomplete("search");
 		},
 
 		_getSuggestions: function(searchTerm, perPage, model) {
@@ -529,15 +528,6 @@
 
 			$shareWithField.prop('disabled', true);
 
-			// Disabling the autocompletion does not clear its search timeout;
-			// removing the focus from the input field does, but only if the
-			// autocompletion is not disabled when the field loses the focus.
-			// Thus, the field has to be disabled before disabling the
-			// autocompletion to prevent an old pending search result from
-			// appearing once the field is enabled again.
-			$shareWithField.autocomplete('close');
-			$shareWithField.autocomplete('disable');
-
 			var restoreUI = function() {
 				self._pendingOperationsCount--;
 				if (self._pendingOperationsCount === 0) {
@@ -561,20 +551,27 @@
 				if (suggestions.length === 0) {
 					restoreUI();
 
-					$shareWithField.autocomplete('enable');
+					var title = t('core', 'No users or groups found for {search}', {search: $shareWithField.val()});
+					if (!self.configModel.get('allowGroupSharing')) {
+						title = t('core', 'No users found for {search}', {search: $('.shareWithField').val()});
+					}
+					$shareWithField.addClass('error')
+						.attr('data-original-title', title)
+						.tooltip('hide')
+						.tooltip({
+							placement: 'bottom',
+							trigger: 'manual'
+						})
+						.tooltip('fixTitle')
+						.tooltip('show');
 
-					// There is no need to show an error message here; it will
-					// be automatically shown when the autocomplete is activated
-					// again (due to the focus on the field) and it finds no
-					// matches.
+					self._invalidSearch = $shareWithField.val();
 
 					return;
 				}
 
 				if (exactMatches.length !== 1) {
 					restoreUI();
-
-					$shareWithField.autocomplete('enable');
 
 					return;
 				}
@@ -583,14 +580,10 @@
 					$shareWithField.val('');
 
 					restoreUI();
-
-					$shareWithField.autocomplete('enable');
 				};
 
 				var actionError = function(obj, msg) {
 					restoreUI();
-
-					$shareWithField.autocomplete('enable');
 
 					OC.Notification.showTemporary(msg);
 				};
@@ -617,12 +610,7 @@
 			}).fail(function(message) {
 				restoreUI();
 
-				$shareWithField.autocomplete('enable');
-
-				// There is no need to show an error message here; it will be
-				// automatically shown when the autocomplete is activated again
-				// (due to the focus on the field) and getting the suggestions
-				// fail.
+				OC.Notification.showTemporary(t('core', 'An error occurred. Please try again'));
 			});
 		},
 
@@ -667,6 +655,18 @@
 			var $shareField = this.$el.find('.shareWithField');
 			if ($shareField.length) {
 				var shareFieldKeydownHandler = function(event) {
+					// Remove the error tooltip if the field is modified; the
+					// check has to be deferred until the key down event has
+					// been fully processed.
+					_.defer(function() {
+						if (self._invalidSearch !== $shareField.val()) {
+							$shareField.removeClass('error')
+								.tooltip('hide');
+
+							delete self._invalidSearch;
+						}
+					});
+
 					if (event.keyCode !== 13) {
 						return true;
 					}
@@ -675,16 +675,6 @@
 
 					return false;
 				};
-
-				$shareField.autocomplete({
-					minLength: 1,
-					delay: 750,
-					focus: function(event) {
-						event.preventDefault();
-					},
-					source: this.autocompleteHandler,
-					select: this._onSelectRecipient
-				}).data('ui-autocomplete')._renderItem = this.autocompleteRenderItem;
 
 				$shareField.on('keydown', null, shareFieldKeydownHandler);
 			}
