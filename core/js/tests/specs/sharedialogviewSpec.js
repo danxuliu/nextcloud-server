@@ -650,7 +650,7 @@ describe('OC.Share.ShareDialogView', function() {
 				it('users', function () {
 					dialog.render();
 					var response = sinon.stub();
-					dialog.autocompleteHandler({term: 'bob'}, response);
+					dialog.autocompleteHandler({term: 'bo'}, response);
 					var jsonData = JSON.stringify({
 						'ocs': {
 							'meta': {
@@ -757,7 +757,7 @@ describe('OC.Share.ShareDialogView', function() {
 				it('groups', function () {
 					dialog.render();
 					var response = sinon.stub();
-					dialog.autocompleteHandler({term: 'group'}, response);
+					dialog.autocompleteHandler({term: 'grou'}, response);
 					var jsonData = JSON.stringify({
 						'ocs': {
 							'meta': {
@@ -808,7 +808,7 @@ describe('OC.Share.ShareDialogView', function() {
 				it('remotes', function () {
 					dialog.render();
 					var response = sinon.stub();
-					dialog.autocompleteHandler({term: 'bob'}, response);
+					dialog.autocompleteHandler({term: 'foo'}, response);
 					var jsonData = JSON.stringify({
 						'ocs': {
 							'meta': {
