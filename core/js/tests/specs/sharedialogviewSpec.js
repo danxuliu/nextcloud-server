@@ -1583,7 +1583,7 @@ describe('OC.Share.ShareDialogView', function() {
 			});
 		});
 
-		it('gracefully handles successful ajax call with failure content', function () {
+		it('throws a notification for a successful ajax call with failure content', function () {
 			dialog.render();
 			var response = sinon.stub();
 			dialog.autocompleteHandler({term: 'bob'}, response);
@@ -1591,7 +1591,8 @@ describe('OC.Share.ShareDialogView', function() {
 				'ocs' : {
 					'meta' : {
 						'status': 'failure',
-						'statuscode': 400
+						'statuscode': 400,
+						'message': 'error message'
 					}
 				}
 			});
@@ -1600,7 +1601,9 @@ describe('OC.Share.ShareDialogView', function() {
 					{'Content-Type': 'application/json'},
 					jsonData
 			);
-			expect(response.calledWithExactly()).toEqual(true);
+			expect(response.called).toEqual(false);
+			expect(showTemporaryNotificationStub.calledOnce).toEqual(true);
+			expect(showTemporaryNotificationStub.firstCall.args[0]).toContain('error message');
 		});
 
 		it('throws a notification when the ajax search lookup fails', function () {
