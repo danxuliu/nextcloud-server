@@ -2079,6 +2079,8 @@ describe('OC.Share.ShareDialogView', function() {
 
 			expect(dialog.$el.find('.shareWithLoading').hasClass('hidden')).toEqual(false);
 			expect(dialog.$el.find('.shareWithConfirm').hasClass('hidden')).toEqual(true);
+			expect(autocompleteStub.lastCall.args[0]).toEqual('disable');
+			expect(autocompleteStub.calledWith('close')).toEqual(true);
 			expect(dialog.$el.find('.shareWithField').prop('disabled')).toEqual(true);
 			expect(dialog.$el.find('.shareWithField').val()).toEqual('bob');
 		});
@@ -2125,6 +2127,7 @@ describe('OC.Share.ShareDialogView', function() {
 			// Ensure that the UI is not restored before adding the share
 			expect(dialog.$el.find('.shareWithLoading').hasClass('hidden')).toEqual(false);
 			expect(dialog.$el.find('.shareWithConfirm').hasClass('hidden')).toEqual(true);
+			expect(autocompleteStub.lastCall.args[0]).toEqual('disable');
 			expect(dialog.$el.find('.shareWithField').prop('disabled')).toEqual(true);
 			expect(dialog.$el.find('.shareWithField').val()).toEqual('bob');
 
@@ -2141,6 +2144,7 @@ describe('OC.Share.ShareDialogView', function() {
 
 			expect(dialog.$el.find('.shareWithLoading').hasClass('hidden')).toEqual(true);
 			expect(dialog.$el.find('.shareWithConfirm').hasClass('hidden')).toEqual(false);
+			expect(autocompleteStub.lastCall.args[0]).toEqual('enable');
 			expect(dialog.$el.find('.shareWithField').prop('disabled')).toEqual(false);
 			expect(dialog.$el.find('.shareWithField').val()).toEqual('');
 		});
@@ -2264,6 +2268,7 @@ describe('OC.Share.ShareDialogView', function() {
 			// Ensure that the UI is not restored before adding the share
 			expect(dialog.$el.find('.shareWithLoading').hasClass('hidden')).toEqual(false);
 			expect(dialog.$el.find('.shareWithConfirm').hasClass('hidden')).toEqual(true);
+			expect(autocompleteStub.lastCall.args[0]).toEqual('disable');
 			expect(dialog.$el.find('.shareWithField').prop('disabled')).toEqual(true);
 			expect(dialog.$el.find('.shareWithField').val()).toEqual('bob');
 
@@ -2280,6 +2285,7 @@ describe('OC.Share.ShareDialogView', function() {
 
 			expect(dialog.$el.find('.shareWithLoading').hasClass('hidden')).toEqual(true);
 			expect(dialog.$el.find('.shareWithConfirm').hasClass('hidden')).toEqual(false);
+			expect(autocompleteStub.lastCall.args[0]).toEqual('enable');
 			expect(dialog.$el.find('.shareWithField').prop('disabled')).toEqual(false);
 			expect(dialog.$el.find('.shareWithField').val()).toEqual('bob');
 
@@ -2322,6 +2328,7 @@ describe('OC.Share.ShareDialogView', function() {
 
 			expect(dialog.$el.find('.shareWithLoading').hasClass('hidden')).toEqual(true);
 			expect(dialog.$el.find('.shareWithConfirm').hasClass('hidden')).toEqual(false);
+			expect(autocompleteStub.lastCall.args[0]).toEqual('enable');
 			expect(dialog.$el.find('.shareWithField').prop('disabled')).toEqual(false);
 			expect(dialog.$el.find('.shareWithField').val()).toEqual('bob');
 
@@ -2374,6 +2381,7 @@ describe('OC.Share.ShareDialogView', function() {
 
 			expect(dialog.$el.find('.shareWithLoading').hasClass('hidden')).toEqual(true);
 			expect(dialog.$el.find('.shareWithConfirm').hasClass('hidden')).toEqual(false);
+			expect(autocompleteStub.lastCall.args[0]).toEqual('enable');
 			expect(dialog.$el.find('.shareWithField').prop('disabled')).toEqual(false);
 			expect(dialog.$el.find('.shareWithField').val()).toEqual('bo');
 		});
@@ -2430,6 +2438,7 @@ describe('OC.Share.ShareDialogView', function() {
 
 			expect(dialog.$el.find('.shareWithLoading').hasClass('hidden')).toEqual(true);
 			expect(dialog.$el.find('.shareWithConfirm').hasClass('hidden')).toEqual(false);
+			expect(autocompleteStub.lastCall.args[0]).toEqual('enable');
 			expect(dialog.$el.find('.shareWithField').prop('disabled')).toEqual(false);
 			expect(dialog.$el.find('.shareWithField').val()).toEqual('bob');
 		});
@@ -2459,6 +2468,7 @@ describe('OC.Share.ShareDialogView', function() {
 
 			expect(dialog.$el.find('.shareWithLoading').hasClass('hidden')).toEqual(true);
 			expect(dialog.$el.find('.shareWithConfirm').hasClass('hidden')).toEqual(false);
+			expect(autocompleteStub.lastCall.args[0]).toEqual('enable');
 			expect(dialog.$el.find('.shareWithField').prop('disabled')).toEqual(false);
 			expect(dialog.$el.find('.shareWithField').val()).toEqual('bob');
 
@@ -2477,6 +2487,7 @@ describe('OC.Share.ShareDialogView', function() {
 
 			expect(dialog.$el.find('.shareWithLoading').hasClass('hidden')).toEqual(true);
 			expect(dialog.$el.find('.shareWithConfirm').hasClass('hidden')).toEqual(false);
+			expect(autocompleteStub.lastCall.args[0]).toEqual('enable');
 			expect(dialog.$el.find('.shareWithField').prop('disabled')).toEqual(false);
 			expect(dialog.$el.find('.shareWithField').val()).toEqual('bob');
 
