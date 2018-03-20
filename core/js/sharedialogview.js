@@ -68,6 +68,9 @@
 		/** @type {object} **/
 		_lastSuggestions: undefined,
 
+		/** @type {int} **/
+		_pendingOperationsCount: 0,
+
 		events: {
 			'focus .shareWithField': 'onShareWithFieldFocus',
 			'input .shareWithField': 'onShareWithFieldChanged',
@@ -343,6 +346,7 @@
 			$loading.removeClass('hidden');
 			$loading.addClass('inlineblock');
 			$confirm.addClass('hidden');
+			this._pendingOperationsCount++;
 
 			$shareWithField.removeClass('error')
 				.tooltip('hide');
@@ -353,9 +357,12 @@
 				perPage,
 				view.model
 			).done(function(suggestions) {
-				$loading.addClass('hidden');
-				$loading.removeClass('inlineblock');
-				$confirm.removeClass('hidden');
+				view._pendingOperationsCount--;
+				if (view._pendingOperationsCount === 0) {
+					$loading.addClass('hidden');
+					$loading.removeClass('inlineblock');
+					$confirm.removeClass('hidden');
+				}
 
 				if (suggestions.length > 0) {
 					$shareWithField
@@ -390,9 +397,12 @@
 					response();
 				}
 			}).fail(function(message) {
-				$loading.addClass('hidden');
-				$loading.removeClass('inlineblock');
-				$confirm.removeClass('hidden');
+				view._pendingOperationsCount--;
+				if (view._pendingOperationsCount === 0) {
+					$loading.addClass('hidden');
+					$loading.removeClass('inlineblock');
+					$confirm.removeClass('hidden');
+				}
 
 				if (message) {
 					OC.Notification.showTemporary(t('core', 'An error occurred ("{message}"). Please try again', { message: message }));
@@ -442,6 +452,8 @@
 		},
 
 		_onSelectRecipient: function(e, s) {
+			var self = this;
+
 			e.preventDefault();
 			// Ensure that the keydown handler for the input field is not
 			// called; otherwise it would try to add the recipient again, which
@@ -449,27 +461,38 @@
 			e.stopImmediatePropagation();
 			$(e.target).attr('disabled', true)
 				.val(s.item.label);
+
 			var $loading = this.$el.find('.shareWithLoading');
-			$loading.removeClass('hidden')
-				.addClass('inlineblock');
 			var $confirm = this.$el.find('.shareWithConfirm');
+
+			$loading.removeClass('hidden');
+			$loading.addClass('inlineblock');
 			$confirm.addClass('hidden');
+			this._pendingOperationsCount++;
 
 			var actionSuccess = function() {
 				$(e.target).val('')
 					.attr('disabled', false);
-				$loading.addClass('hidden')
-					.removeClass('inlineblock');
-				$confirm.removeClass('hidden');
+
+				self._pendingOperationsCount--;
+				if (self._pendingOperationsCount === 0) {
+					$loading.addClass('hidden');
+					$loading.removeClass('inlineblock');
+					$confirm.removeClass('hidden');
+				}
 			};
 
 			var actionError = function(obj, msg) {
 				OC.Notification.showTemporary(msg);
 				$(e.target).attr('disabled', false)
 					.autocomplete('search', $(e.target).val());
-				$loading.addClass('hidden')
-					.removeClass('inlineblock');
-				$confirm.removeClass('hidden');
+
+				self._pendingOperationsCount--;
+				if (self._pendingOperationsCount === 0) {
+					$loading.addClass('hidden');
+					$loading.removeClass('inlineblock');
+					$confirm.removeClass('hidden');
+				}
 			};
 
 			if (s.item.resendMailNotification !== undefined) {
@@ -502,6 +525,7 @@
 			$loading.removeClass('hidden');
 			$loading.addClass('inlineblock');
 			$confirm.addClass('hidden');
+			this._pendingOperationsCount++;
 
 			$shareWithField.prop('disabled', true);
 
@@ -515,9 +539,12 @@
 			$shareWithField.autocomplete('disable');
 
 			var restoreUI = function() {
-				$loading.addClass('hidden');
-				$loading.removeClass('inlineblock');
-				$confirm.removeClass('hidden');
+				self._pendingOperationsCount--;
+				if (self._pendingOperationsCount === 0) {
+					$loading.addClass('hidden');
+					$loading.removeClass('inlineblock');
+					$confirm.removeClass('hidden');
+				}
 
 				$shareWithField.prop('disabled', false);
 				$shareWithField.focus();
