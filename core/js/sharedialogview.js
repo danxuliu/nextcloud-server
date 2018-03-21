@@ -482,7 +482,12 @@
 				});
 			} else {
 				this.model.addShare(s.item.value, {
-					success: actionSuccess,
+					success: function() {
+						// Adding a share changes the suggestions.
+						self._lastSuggestions = undefined;
+
+						actionSuccess();
+					},
 					error: actionError
 				});
 			}
@@ -583,7 +588,12 @@
 					});
 				} else {
 					self.model.addShare(exactMatches[0].value, {
-						success: actionSuccess,
+						success: function() {
+							// Adding a share changes the suggestions.
+							self._lastSuggestions = undefined;
+
+							actionSuccess();
+						},
 						error: actionError
 					});
 				}
