@@ -602,6 +602,8 @@
 							// Adding a share changes the suggestions.
 							self._lastSuggestions = undefined;
 
+							OC.Notification.showTemporary(t('core', 'Share added'));
+
 							actionSuccess();
 						},
 						error: actionError
