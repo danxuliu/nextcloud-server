@@ -136,6 +136,7 @@ if [ "$TIMEOUT_MULTIPLIER" != "" ]; then
 	sed --in-place "s/$ORIGINAL/$REPLACEMENT/" ../../$ACCEPTANCE_TESTS_DIR/config/behat.yml
 fi
 
+# TODO
 if [ "$NEXTCLOUD_SERVER_DOMAIN" != "$DEFAULT_NEXTCLOUD_SERVER_DOMAIN" ]; then
 	# Although Behat documentation states that using the BEHAT_PARAMS
 	# environment variable "You can set any value for any option that is
@@ -144,8 +145,9 @@ if [ "$NEXTCLOUD_SERVER_DOMAIN" != "$DEFAULT_NEXTCLOUD_SERVER_DOMAIN" ]; then
 	# https://github.com/Behat/Behat/issues/983). Thus, the default "behat.yml"
 	# configuration file has to be adjusted to provide the appropriate
 	# parameters for NextcloudTestServerContext.
+	# TODO valid only if no parameters are set in behat.yml
 	ORIGINAL="\
-        - NextcloudTestServerContext"
+        - NextcloudTestServerContext:\?"
 	REPLACEMENT="\
         - NextcloudTestServerContext:\n\
             nextcloudTestServerHelperParameters:\n\
@@ -192,7 +194,10 @@ if [ "$NEXTCLOUD_SERVER_DOMAIN" != "$DEFAULT_NEXTCLOUD_SERVER_DOMAIN" ]; then
 fi
 
 echo "Installing and configuring Nextcloud server"
-$ACCEPTANCE_TESTS_DIR/installAndConfigureServer.sh $INSTALL_AND_CONFIGURE_SERVER_PARAMETERS
+mkdir data
+chown -R www-data:www-data apps config data
+# TODO not a login shell, probably receive the user as a parameter so with the built-in server root is used anyway
+su --shell /bin/bash www-data --command "$ACCEPTANCE_TESTS_DIR/installAndConfigureServer.sh $INSTALL_AND_CONFIGURE_SERVER_PARAMETERS"
 
 echo "Saving the default state so acceptance tests can reset to it"
 find . -name ".gitignore" -exec rm --force {} \;
