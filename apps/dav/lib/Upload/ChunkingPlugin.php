@@ -92,6 +92,7 @@ class ChunkingPlugin extends ServerPlugin {
 	 * @throws BadRequest
 	 */
 	private function verifySize() {
+// 			throw new BadRequest("Lalala");
 		$expectedSize = $this->server->httpRequest->getHeader('OC-Total-Length');
 		if ($expectedSize === null) {
 			return;

@@ -123,6 +123,10 @@ class File extends Node implements IFile {
 			throw new ServiceUnavailable("File is not updatable: " . $e->getMessage());
 		}
 
+		if (rand(0, 10) < 6) {
+// 			$this->convertToSabreException(new \Exception("lalala " . rand()));
+		}
+
 		// verify path of the target
 		$this->verifyPath();
 

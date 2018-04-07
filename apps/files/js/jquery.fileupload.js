@@ -665,7 +665,9 @@
                 return this._processQueue || getPromise([this]);
             };
             data.submit = function () {
+console.log("data.submit()");
                 if (this.state() !== 'pending') {
+console.log("data.submit() not pending");
                     data.jqXHR = this.jqXHR =
                         (that._trigger(
                             'submit',
@@ -673,6 +675,7 @@
                             this
                         ) !== false) && that._onSend(e, this);
                 }
+console.log("data.submit() end");
                 return this.jqXHR || that._getXHRPromise();
             };
             data.abort = function () {
@@ -819,6 +822,7 @@
         },
 
         _beforeSend: function (e, data) {
+console.log("Before send: ");
             if (this._active === 0) {
                 // the start callback is triggered when an upload starts
                 // and no other uploads are currently running,
@@ -839,6 +843,7 @@
             data._progress.total = data.total = this._getTotal(data.files) || 1;
             data._progress.bitrate = data.bitrate = 0;
             this._active += 1;
+console.log("Active after +1: " + this._active);
             // Initialize the global progress values:
             this._progress.loaded += data.loaded;
             this._progress.total += data.total;
@@ -917,6 +922,7 @@
                         );
                         that._sending -= 1;
                         that._active -= 1;
+console.log("Active after -1: " + that._active);
                         if (options.limitConcurrentUploads &&
                                 options.limitConcurrentUploads > that._sending) {
                             // Start the next queued upload,

@@ -187,9 +187,12 @@ OC.FileUpload.prototype = {
 	},
 
 	/**
-	 * Submit the upload
+	 * Prepares the upload to be submitted.
+	 *
+	 * @return jQuery.Promise a promise that is resolved when the upload is
+	 *         ready to be submitted.
 	 */
-	submit: function() {
+	prepare: function() {
 		var self = this;
 		var data = this.data;
 		var file = this.getFile();
@@ -242,13 +245,20 @@ OC.FileUpload.prototype = {
 			chunkFolderPromise = $.Deferred().resolve().promise();
 		}
 
+		var neededFoldersReady = $.Deferred();
+
 		// wait for creation of the required directory before uploading
 		$.when(folderPromise, chunkFolderPromise).then(function() {
-			data.submit();
+// console.log("Before data submit");
+// 			data.submit();
+// console.log("After data submit");
+			neededFoldersReady.resolve();
 		}, function() {
 			self.abort();
+			neededFoldersReady.reject();
 		});
 
+		return neededFoldersReady.promise();
 	},
 
 	/**
@@ -531,10 +541,23 @@ OC.Uploader.prototype = _.extend({
 	 */
 	submitUploads: function(uploads) {
 		var self = this;
+
+		var allUploadsReady = [];
 		_.each(uploads, function(upload) {
-			self._uploads[upload.data.uploadId] = upload;
-			upload.submit();
+// 			self._uploads[upload.data.uploadId] = upload;
+console.log("Before submitting upload: " + upload.data.uploadId);
+			allUploadsReady.push(upload.prepare());
+console.log("After submitting upload: " + upload.data.uploadId);
+
 		});
+
+		$.when.apply($, allUploadsReady).done(function() {
+			_.each(uploads, function(upload) {
+				self._uploads[upload.data.uploadId] = upload;
+				upload.data.submit();
+			});
+		});
+		// TODO what happens if this fails? And if there are uploads in progress?
 	},
 
 	/**
@@ -576,7 +599,9 @@ OC.Uploader.prototype = _.extend({
 	 * Clear uploads
 	 */
 	clear: function() {
+		this.log('clear uploads');
 		this._uploads = {};
+		// TODO probably move to submit
 		this._knownDirs = {};
 	},
 	/**
@@ -587,8 +612,10 @@ OC.Uploader.prototype = _.extend({
 	 */
 	getUpload: function(data) {
 		if (_.isString(data)) {
+		this.log('get upload string');
 			return this._uploads[data];
 		} else if (data.uploadId && this._uploads[data.uploadId]) {
+		this.log('get upload raw');
 			this._uploads[data.uploadId].data = data;
 			return this._uploads[data.uploadId];
 		}
@@ -662,7 +689,7 @@ OC.Uploader.prototype = _.extend({
 		// resubmit upload
 		this.submitUploads([upload]);
 	},
-	_trace:false, //TODO implement log handler for JS per class?
+	_trace:true, //TODO implement log handler for JS per class?
 	log:function(caption, e, data) {
 		if (this._trace) {
 			console.log(caption);
